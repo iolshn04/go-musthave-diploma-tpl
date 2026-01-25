@@ -45,13 +45,11 @@ func TestRegisterHandlerOK(t *testing.T) {
 
 	body := []byte(`{"login":"test","password":"123"}`)
 	req := httptest.NewRequest(http.MethodPost, "/api/user/register", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
 	handler.Register(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "User successfully registered")
 	assert.NotEmpty(t, w.Result().Cookies())
 }
 

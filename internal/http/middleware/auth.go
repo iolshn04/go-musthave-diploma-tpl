@@ -7,8 +7,6 @@ import (
 	"encoding/hex"
 	"net/http"
 	"strings"
-
-	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/http/response"
 )
 
 type contextKey string
@@ -23,14 +21,13 @@ func AuthMiddleware(secretKey string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c, err := r.Cookie(cookieName)
 			if err != nil || !validCookie(c.Value, secretKey) {
-				response.Unauthorized(w)
+				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			parts := strings.Split(c.Value, "|")
-			userID := parts[0]
+			ctx := context.WithValue(r.Context(), UserIDKey, parts[0])
 
-			ctx := context.WithValue(r.Context(), UserIDKey, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -48,4 +45,9 @@ func validCookie(value, secretKey string) bool {
 		return false
 	}
 	return Sign(parts[0], secretKey) == parts[1]
+}
+
+func UserID(ctx context.Context) string {
+	id, _ := ctx.Value(UserIDKey).(string)
+	return id
 }

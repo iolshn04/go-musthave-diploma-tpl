@@ -6,7 +6,6 @@ import (
 
 	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/auth"
 	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/http/middleware"
-	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/http/response"
 )
 
 type AuthHandler struct {
@@ -29,18 +28,18 @@ type authRequest struct {
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req authRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.RespondJSON(w, http.StatusBadRequest, "invalid JSON body")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if req.Login == "" || req.Password == "" {
-		response.RespondJSON(w, http.StatusBadRequest, "login and password are required")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.service.Register(r.Context(), req.Login, req.Password)
 	if err != nil {
-		response.RespondJSON(w, http.StatusConflict, "login already exists")
+		w.WriteHeader(http.StatusConflict)
 		return
 	}
 
@@ -53,24 +52,24 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	response.RespondJSON(w, http.StatusOK, "User successfully registered")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req authRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.RespondJSON(w, http.StatusBadRequest, "invalid JSON body")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if req.Login == "" || req.Password == "" {
-		response.RespondJSON(w, http.StatusBadRequest, "login and password are required")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.service.Authenticate(r.Context(), req.Login, req.Password)
 	if err != nil {
-		response.RespondJSON(w, http.StatusUnauthorized, "invalid login or password")
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -83,5 +82,5 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	response.RespondJSON(w, http.StatusOK, "User successfully logged in")
+	w.WriteHeader(http.StatusOK)
 }
