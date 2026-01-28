@@ -19,6 +19,11 @@ type Repository interface {
 	List(ctx context.Context, userID string) ([]Order, error)
 }
 
+type ServiceInterface interface {
+	Upload(ctx context.Context, userID, number string) error
+	List(ctx context.Context, userID string) ([]Order, error)
+}
+
 type Service struct {
 	repo Repository
 }
