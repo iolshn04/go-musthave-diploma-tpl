@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,14 +15,14 @@ import (
 
 type mockService struct {
 	uploadFunc func(ctx context.Context, userID, number string) error
-	listFunc   func(ctx context.Context, userID string) ([]orders.Order, error)
+	listFunc   func(ctx context.Context, userID string) ([]models.Order, error)
 }
 
 func (m *mockService) Upload(ctx context.Context, userID, number string) error {
 	return m.uploadFunc(ctx, userID, number)
 }
 
-func (m *mockService) List(ctx context.Context, userID string) ([]orders.Order, error) {
+func (m *mockService) List(ctx context.Context, userID string) ([]models.Order, error) {
 	return m.listFunc(ctx, userID)
 }
 
@@ -71,13 +72,13 @@ func TestOrdersHandlerList(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		mockOrders []orders.Order
+		mockOrders []models.Order
 		mockErr    error
 		wantStatus int
 		wantBody   bool
 	}{
-		{"empty list", []orders.Order{}, nil, http.StatusNoContent, false},
-		{"list with orders", []orders.Order{
+		{"empty list", []models.Order{}, nil, http.StatusNoContent, false},
+		{"list with orders", []models.Order{
 			{Number: "123", Status: "NEW", UploadedAt: now, Accrual: &accrual},
 		}, nil, http.StatusOK, true},
 		{"error", nil, context.DeadlineExceeded, http.StatusInternalServerError, false},
@@ -86,7 +87,7 @@ func TestOrdersHandlerList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &mockService{
-				listFunc: func(ctx context.Context, userID string) ([]orders.Order, error) {
+				listFunc: func(ctx context.Context, userID string) ([]models.Order, error) {
 					return tt.mockOrders, tt.mockErr
 				},
 			}

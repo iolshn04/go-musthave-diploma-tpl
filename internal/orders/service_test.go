@@ -3,6 +3,7 @@ package orders
 import (
 	"context"
 	"errors"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,11 +34,11 @@ func (m *mockRepo) Owner(ctx context.Context, number string) (string, error) {
 	return uid, nil
 }
 
-func (m *mockRepo) List(ctx context.Context, userID string) ([]Order, error) {
-	var res []Order
+func (m *mockRepo) List(ctx context.Context, userID string) ([]models.Order, error) {
+	var res []models.Order
 	for num, uid := range m.data {
 		if uid == userID {
-			res = append(res, Order{Number: num, Status: "NEW"})
+			res = append(res, models.Order{Number: num, Status: "NEW"})
 		}
 	}
 	return res, nil
@@ -53,19 +54,15 @@ func TestServiceUpload(t *testing.T) {
 	err := s.Upload(context.Background(), user, "")
 	assert.Equal(t, ErrEmptyBody, err)
 
-	// неверный Luhn
 	err = s.Upload(context.Background(), user, "1234")
 	assert.Equal(t, ErrInvalidNumber, err)
 
-	// новый валидный заказ
 	err = s.Upload(context.Background(), user, "79927398713")
 	assert.NoError(t, err)
 
-	// повторный заказ тем же пользователем
 	err = s.Upload(context.Background(), user, "79927398713")
 	assert.Equal(t, ErrAlreadyMine, err)
 
-	// заказ другим пользователем
 	err = s.Upload(context.Background(), "user2", "79927398713")
 	assert.Equal(t, ErrAlreadyExists, err)
 }

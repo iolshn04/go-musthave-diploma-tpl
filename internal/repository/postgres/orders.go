@@ -3,11 +3,10 @@ package postgres
 import (
 	"context"
 	"errors"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-
-	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/orders"
 )
 
 type OrdersRepository struct {
@@ -39,8 +38,8 @@ func (r *OrdersRepository) Owner(ctx context.Context, number string) (string, er
 	return uid, nil
 }
 
-func (r *OrdersRepository) List(ctx context.Context, userID string) ([]orders.Order, error) {
-	var res []orders.Order
+func (r *OrdersRepository) List(ctx context.Context, userID string) ([]models.Order, error) {
+	var res []models.Order
 
 	err := r.db.SelectContext(ctx, &res, `
 		SELECT number, status, accrual, uploaded_at

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/balance"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -39,6 +40,15 @@ func NewRouter(repo *postgres.Repository, cfg *config.Config) http.Handler {
 		r.Post("/orders", ordersHandler.Upload)
 		r.Get("/orders", ordersHandler.List)
 	})
+
+	// balance
+	balanceRepo := postgres.NewBalanceRepository(repo.DB)
+	balanceService := balance.New(balanceRepo)
+	balanceHandler := handlers.NewBalanceHandler(balanceService)
+
+	r.Get("/api/user/balance", balanceHandler.Get)
+	r.Post("/api/user/balance/withdraw", balanceHandler.Withdraw)
+	r.Get("/api/user/withdrawals", balanceHandler.Withdrawals)
 
 	return r
 }

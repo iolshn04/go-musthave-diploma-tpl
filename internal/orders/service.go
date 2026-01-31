@@ -2,26 +2,19 @@ package orders
 
 import (
 	"context"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 	"strings"
-	"time"
 )
-
-type Order struct {
-	Number     string    `json:"number" db:"number"`
-	Status     string    `json:"status" db:"status"`
-	Accrual    *float64  `json:"accrual,omitempty" db:"accrual"`
-	UploadedAt time.Time `json:"uploaded_at" db:"uploaded_at"`
-}
 
 type Repository interface {
 	Save(ctx context.Context, userID, number string) error
 	Owner(ctx context.Context, number string) (string, error)
-	List(ctx context.Context, userID string) ([]Order, error)
+	List(ctx context.Context, userID string) ([]models.Order, error)
 }
 
 type ServiceInterface interface {
 	Upload(ctx context.Context, userID, number string) error
-	List(ctx context.Context, userID string) ([]Order, error)
+	List(ctx context.Context, userID string) ([]models.Order, error)
 }
 
 type Service struct {
@@ -57,6 +50,6 @@ func (s *Service) Upload(ctx context.Context, userID, number string) error {
 	return nil
 }
 
-func (s *Service) List(ctx context.Context, userID string) ([]Order, error) {
+func (s *Service) List(ctx context.Context, userID string) ([]models.Order, error) {
 	return s.repo.List(ctx, userID)
 }

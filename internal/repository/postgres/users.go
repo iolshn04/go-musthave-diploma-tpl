@@ -26,6 +26,7 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	`
 
 	_, err := r.db.ExecContext(ctx, q, user.ID, user.Login, user.PasswordHash)
+
 	if err != nil {
 		return ErrUserExists
 	}
