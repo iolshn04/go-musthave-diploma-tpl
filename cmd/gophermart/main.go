@@ -17,8 +17,6 @@ func main() {
 	}
 	defer repo.DB.Close()
 
-	_ = repo // позже прокинем дальше
-
 	application := app.New(cfg, repo)
 
 	log.Printf("starting server on %s", cfg.RunAddress)

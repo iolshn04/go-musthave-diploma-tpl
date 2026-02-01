@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/balance"
 
@@ -18,6 +19,7 @@ func NewBalanceRepository(db *sqlx.DB) *BalanceRepository {
 }
 
 func (r *BalanceRepository) Get(ctx context.Context, userID string) (models.Balance, error) {
+	fmt.Println("userID:", userID)
 	const q = `
 	SELECT
 	  COALESCE(SUM(o.accrual),0) -
@@ -85,4 +87,14 @@ func (r *BalanceRepository) Withdrawals(ctx context.Context, userID string) ([]m
 	`, userID)
 
 	return res, err
+}
+
+func (r *BalanceRepository) Add(ctx context.Context, userID string, sum float64) error {
+	_, err := r.db.ExecContext(ctx, `
+		UPDATE balances
+		SET current = current + $2
+		WHERE user_id=$1
+	`, userID, sum)
+
+	return err
 }

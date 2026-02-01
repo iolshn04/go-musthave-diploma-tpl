@@ -20,18 +20,31 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 }
 
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
-	const q = `
+	tx, err := r.db.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	const userQ = `
 		INSERT INTO users (id, login, password_hash)
 		VALUES ($1, $2, $3)
 	`
 
-	_, err := r.db.ExecContext(ctx, q, user.ID, user.Login, user.PasswordHash)
-
-	if err != nil {
+	if _, err := tx.ExecContext(ctx, userQ, user.ID, user.Login, user.PasswordHash); err != nil {
 		return ErrUserExists
 	}
 
-	return nil
+	const balanceQ = `
+		INSERT INTO balances (user_id, current, withdrawn)
+		VALUES ($1, 0, 0)
+	`
+
+	if _, err := tx.ExecContext(ctx, balanceQ, user.ID); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (r *UserRepository) GetByLogin(ctx context.Context, login string) (*models.User, error) {

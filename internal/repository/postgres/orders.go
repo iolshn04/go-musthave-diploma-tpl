@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"errors"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/accrual"
 	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 
 	"github.com/google/uuid"
@@ -49,4 +50,26 @@ func (r *OrdersRepository) List(ctx context.Context, userID string) ([]models.Or
 	`, userID)
 
 	return res, err
+}
+
+func (r *OrdersRepository) ListForProcessing(ctx context.Context) ([]accrual.OrderForUpdate, error) {
+	var res []accrual.OrderForUpdate
+
+	err := r.db.SelectContext(ctx, &res, `
+		SELECT number, user_id
+		FROM orders
+		WHERE status IN ('NEW','PROCESSING')
+	`)
+
+	return res, err
+}
+
+func (r *OrdersRepository) Update(ctx context.Context, number, status string, accrual *float64) error {
+	_, err := r.db.ExecContext(ctx, `
+		UPDATE orders
+		SET status=$2, accrual=$3
+		WHERE number=$1
+	`, number, status, accrual)
+
+	return err
 }
