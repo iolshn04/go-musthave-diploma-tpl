@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/http/middleware"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -34,13 +35,9 @@ func (m *mockBalanceService) Withdrawals(ctx context.Context, userID string) ([]
 }
 
 func ctxWithUser(r *http.Request) *http.Request {
-	ctx := context.WithValue(r.Context(), "userID", "user1")
+	ctx := context.WithValue(r.Context(), middleware.UserIDKey, "user1")
 	return r.WithContext(ctx)
 }
-
-//
-// GET BALANCE
-//
 
 func TestBalanceHandler_Get_OK(t *testing.T) {
 	svc := &mockBalanceService{
@@ -78,10 +75,6 @@ func TestBalanceHandler_Get_Error(t *testing.T) {
 		t.Fatal("expected 500")
 	}
 }
-
-//
-// POST WITHDRAW
-//
 
 func TestBalanceHandler_Withdraw_OK(t *testing.T) {
 	svc := &mockBalanceService{}
@@ -137,10 +130,6 @@ func TestBalanceHandler_Withdraw_Invalid(t *testing.T) {
 		t.Fatal("expected 422")
 	}
 }
-
-//
-// GET WITHDRAWALS
-//
 
 func TestBalanceHandler_Withdrawals_OK(t *testing.T) {
 	svc := &mockBalanceService{

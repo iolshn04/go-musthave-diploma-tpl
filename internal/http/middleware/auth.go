@@ -11,10 +11,8 @@ import (
 
 type contextKey string
 
-const (
-	UserIDKey  contextKey = "user_id"
-	cookieName            = "auth"
-)
+const UserIDKey contextKey = "user_id"
+const cookieName string = "auth"
 
 func AuthMiddleware(secretKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

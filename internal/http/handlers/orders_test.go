@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/http/middleware"
 	"github.com/iolshn04/go-musthave-diploma-tpl/tree/master/internal/models"
 	"net/http"
 	"net/http/httptest"
@@ -53,14 +54,15 @@ func TestOrdersHandlerUpload(t *testing.T) {
 			h := NewOrdersHandler(mock)
 
 			req := httptest.NewRequest(http.MethodPost, "/api/user/orders", bytes.NewBufferString(tt.body))
-			// Подменяем контекст для middleware.UserID
-			req = req.WithContext(context.WithValue(req.Context(), "userID", fakeUserID()))
+			req = req.WithContext(context.WithValue(req.Context(), middleware.UserIDKey, fakeUserID()))
 
 			w := httptest.NewRecorder()
 			h.Upload(w, req)
+			resp := w.Result()
+			defer resp.Body.Close()
 
-			if w.Result().StatusCode != tt.wantStatus {
-				t.Errorf("got status %d, want %d", w.Result().StatusCode, tt.wantStatus)
+			if resp.StatusCode != tt.wantStatus {
+				t.Errorf("got status %d, want %d", resp.StatusCode, tt.wantStatus)
 			}
 		})
 	}
@@ -94,13 +96,15 @@ func TestOrdersHandlerList(t *testing.T) {
 			h := NewOrdersHandler(mock)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/user/orders", nil)
-			req = req.WithContext(context.WithValue(req.Context(), "userID", fakeUserID()))
+			req = req.WithContext(context.WithValue(req.Context(), middleware.UserIDKey, fakeUserID()))
 			w := httptest.NewRecorder()
 
 			h.List(w, req)
+			resp := w.Result()
+			defer resp.Body.Close()
 
-			if w.Result().StatusCode != tt.wantStatus {
-				t.Errorf("got status %d, want %d", w.Result().StatusCode, tt.wantStatus)
+			if resp.StatusCode != tt.wantStatus {
+				t.Errorf("got status %d, want %d", resp.StatusCode, tt.wantStatus)
 			}
 
 			if tt.wantBody {

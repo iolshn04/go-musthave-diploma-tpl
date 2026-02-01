@@ -49,8 +49,11 @@ func TestRegisterHandlerOK(t *testing.T) {
 
 	handler.Register(w, req)
 
+	resp := w.Result()
+	defer resp.Body.Close()
+
 	assert.Equal(t, http.StatusOK, w.Code)
-	assert.NotEmpty(t, w.Result().Cookies())
+	assert.NotEmpty(t, resp.Cookies())
 }
 
 func TestRegisterInvalidBody(t *testing.T) {

@@ -14,10 +14,9 @@ type Config struct {
 
 func New() *Config {
 	const (
-		defaultRunAddress           = "localhost:8080"
-		defaultDatabaseURI          = "postgres://gophermart:secret@localhost:5432/gophermart?sslmode=disable"
-		defaultAccrualSystemAddress = "http://localhost:8081"
-		defaultSecretKey            = "super-secret-key"
+		defaultRunAddress  = "localhost:8080"
+		defaultDatabaseURI = "postgres://gophermart:secret@localhost:5432/gophermart?sslmode=disable"
+		defaultSecretKey   = "super-secret-key"
 	)
 
 	fs := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
@@ -51,7 +50,7 @@ func New() *Config {
 	} else if *flagAccrual != "" {
 		cfg.AccrualSystemAddress = *flagAccrual
 	} else {
-		cfg.AccrualSystemAddress = defaultAccrualSystemAddress
+		cfg.AccrualSystemAddress = "http://localhost:8081"
 	}
 
 	if val, ok := os.LookupEnv("SECRET_KEY"); ok {

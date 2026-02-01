@@ -28,17 +28,17 @@ func (h *OrdersHandler) Upload(w http.ResponseWriter, r *http.Request) {
 
 	switch err {
 	case nil:
-		w.WriteHeader(http.StatusAccepted) // 202
+		w.WriteHeader(http.StatusAccepted)
 	case orders.ErrEmptyBody:
-		w.WriteHeader(http.StatusBadRequest) // 400
+		w.WriteHeader(http.StatusBadRequest)
 	case orders.ErrInvalidNumber:
-		w.WriteHeader(http.StatusUnprocessableEntity) // 422
+		w.WriteHeader(http.StatusUnprocessableEntity)
 	case orders.ErrAlreadyMine:
-		w.WriteHeader(http.StatusOK) // 200
+		w.WriteHeader(http.StatusOK)
 	case orders.ErrAlreadyExists:
-		w.WriteHeader(http.StatusConflict) // 409
+		w.WriteHeader(http.StatusConflict)
 	default:
-		w.WriteHeader(http.StatusInternalServerError) // 500
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
@@ -52,7 +52,7 @@ func (h *OrdersHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(ordersList) == 0 {
-		w.WriteHeader(http.StatusNoContent) // 204
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
